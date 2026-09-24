@@ -1,0 +1,126 @@
+name: Frontend uitrollen
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'robots.txt'
+      - '.htaccess'
+      - '.github/workflows/frontend-deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: frontend-uitrollen
+  cancel-in-progress: false
+
+jobs:
+  uitrollen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code ophalen
+        uses: actions/checkout@v4
+
+      - name: Map klaarzetten
+        run: |
+          set -euo pipefail
+          mkdir -p uitrol
+          cp index.html uitrol/index.html
+          cp robots.txt uitrol/robots.txt
+          cp .htaccess  uitrol/.htaccess
+          ls -la uitrol
+
+      - name: Controleren of de geheimen er zijn
+        env:
+          HOST: ${{ secrets.SFTP_HOST }}
+          USER: ${{ secrets.SFTP_USER }}
+          DIR: ${{ secrets.SFTP_REMOTE_DIR }}
+          WACHTWOORD: ${{ secrets.SFTP_PASSWORD }}
+          SLEUTEL: ${{ secrets.SFTP_KEY }}
+        run: |
+          set -euo pipefail
+          ontbreekt=""
+          [ -n "$HOST" ] || ontbreekt="$ontbreekt SFTP_HOST"
+          [ -n "$USER" ] || ontbreekt="$ontbreekt SFTP_USER"
+          [ -n "$DIR" ]  || ontbreekt="$ontbreekt SFTP_REMOTE_DIR"
+          if [ -z "$WACHTWOORD" ] && [ -z "$SLEUTEL" ]; then
+            ontbreekt="$ontbreekt SFTP_PASSWORD-of-SFTP_KEY"
+          fi
+          if [ -n "$ontbreekt" ]; then
+            echo "Deze geheimen ontbreken:$ontbreekt"
+            exit 1
+          fi
+          if [ -n "$SLEUTEL" ]; then
+            echo "HEEFT_SLEUTEL=ja" >> "$GITHUB_ENV"
+          else
+            echo "HEEFT_SLEUTEL=nee" >> "$GITHUB_ENV"
+          fi
+          echo "Alle geheimen staan ingesteld."
+
+      - name: Servervingerafdruk klaarzetten
+        env:
+          KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          if [ -n "$KNOWN_HOSTS" ]; then
+            printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+            chmod 600 ~/.ssh/known_hosts
+            echo "CONTROLE=ja" >> "$GITHUB_ENV"
+          else
+            echo "LET OP: SFTP_KNOWN_HOSTS is niet gezet."
+            echo "CONTROLE=nee" >> "$GITHUB_ENV"
+          fi
+
+      - name: Sleutel klaarzetten
+        if: env.HEEFT_SLEUTEL == 'ja'
+        env:
+          SLEUTEL: ${{ secrets.SFTP_KEY }}
+        run: |
+          set -euo pipefail
+          printf '%s\n' "$SLEUTEL" > ~/.ssh/uitrol_sleutel
+          chmod 600 ~/.ssh/uitrol_sleutel
+
+      - name: lftp installeren
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Uploaden via SFTP
+        env:
+          HOST: ${{ secrets.SFTP_HOST }}
+          PORT: ${{ secrets.SFTP_PORT }}
+          USER: ${{ secrets.SFTP_USER }}
+          WACHTWOORD: ${{ secrets.SFTP_PASSWORD }}
+          SLEUTEL: ${{ secrets.SFTP_KEY }}
+          DIR: ${{ secrets.SFTP_REMOTE_DIR }}
+        run: |
+          set -euo pipefail
+          poort="${PORT:-22}"
+          if [ "${CONTROLE}" = "ja" ]; then
+            ssh_opties="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts"
+          else
+            ssh_opties="-o StrictHostKeyChecking=accept-new"
+          fi
+          script=$(mktemp)
+          chmod 600 "$script"
+          {
+            echo "set net:max-retries 3"
+            echo "set net:timeout 20"
+            echo "set sftp:auto-confirm no"
+            if [ -n "$SLEUTEL" ]; then
+              echo "set sftp:connect-program \"ssh -a -x -i $HOME/.ssh/uitrol_sleutel $ssh_opties\""
+              echo "open -u \"$USER\", sftp://$HOST:$poort"
+            else
+              echo "set sftp:connect-program \"ssh -a -x $ssh_opties\""
+              echo "open -u \"$USER\",\"$WACHTWOORD\" sftp://$HOST:$poort"
+            fi
+            echo "cd \"$DIR\""
+            echo "mirror -R --verbose --no-perms --parallel=2 uitrol ."
+            echo "bye"
+          } > "$script"
+          lftp -f "$script"
+          rm -f "$script"
+          echo "Upload klaar."
+
+      - name: Opruimen
+        if: always()
+        run: rm -f ~/.ssh/uitrol_sleutel
