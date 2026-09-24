@@ -1,0 +1,4 @@
+# Niet vindbaar in zoekmachines. Wie de link heeft, kan de pagina wel openen.
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
