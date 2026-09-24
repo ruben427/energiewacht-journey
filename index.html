@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Energiewacht Onderhoudsreis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#F3F5F6; --surface:#FFFFFF; --sunk:#E9EDF0; --ink:#15202A; --muted:#566471; --line:#D8DFE4;
+  --warm:#C9502A; --cool:#2471B3; --warm-soft:#FBE9E2; --cool-soft:#E3EEF8;
+  --good:#2F7D4F; --good-soft:#E2F1E7;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E151B; --surface:#16202A; --sunk:#1C2833; --ink:#E4EAEE; --muted:#95A3AF; --line:#2A3743;
+    --warm:#EE7C52; --cool:#5AA5E0; --warm-soft:#3A2119; --cool-soft:#15293A;
+    --good:#6CC08E; --good-soft:#16301F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E151B; --surface:#16202A; --sunk:#1C2833; --ink:#E4EAEE; --muted:#95A3AF; --line:#2A3743;
+  --warm:#EE7C52; --cool:#5AA5E0; --warm-soft:#3A2119; --cool-soft:#15293A;
+  --good:#6CC08E; --good-soft:#16301F;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.5;padding-inline:clamp(16px,3vw,40px);padding-block:32px 56px}
+.wrap{max-width:1480px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4vw,44px);line-height:1.05;margin:6px 0 10px;text-wrap:balance;letter-spacing:-.01em}
+h1 .w{color:var(--warm)} h1 .c{color:var(--cool)}
+.lede{max-width:64ch;color:var(--muted);margin:0;font-size:15px}
+header{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;align-items:end}
+@media (max-width:860px){header{grid-template-columns:1fr}}
+.persona{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:8px}
+.persona h2{font-family:var(--display);font-size:18px;margin:0;font-weight:700}
+.persona p{margin:0;color:var(--muted)}
+.persona dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:4px 0 0}
+.persona dt{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding-top:2px}
+.persona dd{margin:0}
+.tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:var(--sunk);color:var(--muted)}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 13px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,.phase-h:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+.hint{color:var(--muted);font-size:13px}
+
+.scroller{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.map{display:grid;grid-template-columns:150px repeat(6,minmax(230px,1fr));min-width:1540px}
+.map > div{border-bottom:1px solid var(--line);padding:14px 14px}
+.map > div:not(.lane){border-left:1px solid var(--line)}
+.lane{position:sticky;left:0;z-index:2;background:var(--surface);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.lane small{font-family:var(--body);text-transform:none;letter-spacing:0;font-size:12px;line-height:1.35}
+.row-last > div{border-bottom:0}
+.phase-h{cursor:pointer;background:var(--sunk);display:flex;flex-direction:column;gap:4px;position:relative}
+.phase-h .n{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.phase-h h3{font-family:var(--display);font-size:18px;line-height:1.15;margin:0;font-weight:700;text-wrap:balance}
+.phase-h::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:linear-gradient(90deg,var(--cool),var(--warm));opacity:0;transition:opacity .15s}
+.map.focus .dim{opacity:.35}
+.map.focus .on.phase-h::after{opacity:1}
+.cell{transition:opacity .15s}
+ul{margin:0;padding-left:16px;display:grid;gap:4px}
+li::marker{color:var(--muted)}
+.quote{font-family:var(--display);font-size:15px;line-height:1.35;font-weight:500;margin:0}
+.quote::before{content:"“";color:var(--warm)} .quote::after{content:"”";color:var(--warm)}
+.feel{margin-top:6px;color:var(--muted);font-size:13px}
+.goal{font-weight:500}
+.tp{display:flex;flex-wrap:wrap;gap:4px}
+.tp span{font-size:12px;padding:2px 8px;border-radius:4px;background:var(--cool-soft);color:var(--ink)}
+.mot{background:var(--warm-soft)!important}
+.mot p{margin:0}
+.mot b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--warm);margin-bottom:4px}
+.kpi{display:grid;gap:4px}
+.kpi span{font-family:var(--mono);font-size:12px;display:flex;gap:6px}
+.kpi span::before{content:"◆";color:var(--good);font-size:9px;padding-top:3px}
+.avoid li::marker{content:"✕  ";color:var(--warm)}
+
+.emo{grid-column:2 / -1;position:relative;height:150px;border-left:1px solid var(--line);padding:0!important}
+.emo svg{position:absolute;inset:14px 0 26px 0;width:100%;height:calc(100% - 40px);overflow:visible}
+.emo .grid line{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
+.emo .curve{fill:none;stroke:url(#g);stroke-width:3;vector-effect:non-scaling-stroke}
+.emo .area{fill:url(#ga);opacity:.18}
+.dot{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
+.dot i{width:12px;height:12px;border-radius:50%;background:var(--surface);border:3px solid var(--ink)}
+.dot em{font-style:normal;font-family:var(--mono);font-size:11px;background:var(--surface);padding:0 4px;border-radius:3px;white-space:nowrap}
+.scale{font-family:var(--mono);font-size:10px;color:var(--muted)}
+
+.dev{display:grid;gap:8px}
+.dev div{display:grid;gap:2px;padding-left:10px;border-left:3px solid var(--line)}
+.dev div[data-d="cv"]{border-color:var(--warm)}
+.dev div[data-d="wp"]{border-color:var(--good)}
+.dev div[data-d="ac"]{border-color:var(--cool)}
+.dev b{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+
+.foot{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.foot section{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:8px;align-content:start}
+.foot h2{font-family:var(--display);font-size:17px;margin:0}
+.foot p{margin:0;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Energiewacht · Customer journey · to-be</div>
+      <h1>Van oriëntatie tot eerste onderhoud aan je <span class="w">verwarming</span> en <span class="c">koeling</span></h1>
+      <p class="lede">Hoe de ideale reis eruitziet voor een particuliere huiseigenaar die een onderhoudscontract afsluit. Zes fases, van eerste vraag tot de acceptatiebeurt met het eerste onderhoud, en daarna het leven als klant: onderhoud om de één à twee jaar en 24/7 storingshulp. Klik op een fase om die uit te lichten, of kies een toestel.</p>
+    </div>
+    <aside class="persona" aria-label="Persona">
+      <span class="tag">Voorbeeldpersona</span>
+      <h2>Mirjam, huiseigenaar</h2>
+      <p>Woont met gezin in een tussenwoning. Heeft recent een nieuw toestel laten plaatsen of vervangt een aflopend contract. Niet technisch, wel kritisch op prijs en gedoe.</p>
+      <dl>
+        <dt>Wil</dt><dd>Zekerheid dat het toestel veilig en zuinig blijft draaien</dd>
+        <dt>Vreest</dt><dd>Verborgen kosten, een dag vrij nemen voor niets, jargon</dd>
+        <dt>Succes</dt><dd>"Ik hoef er niet meer over na te denken."</dd>
+      </dl>
+    </aside>
+  </header>
+
+  <div class="controls">
+    <div class="chips" role="group" aria-label="Toestel">
+      <button class="chip" id="d-all" data-dev="all" aria-pressed="true">Alle toestellen</button>
+      <button class="chip" id="d-cv" data-dev="cv" aria-pressed="false">Cv-ketel</button>
+      <button class="chip" id="d-wp" data-dev="wp" aria-pressed="false">Warmtepomp</button>
+      <button class="chip" id="d-ac" data-dev="ac" aria-pressed="false">Airco / koeling</button>
+    </div>
+    <span class="hint" id="hint">Klik op een fasekop om te focussen</span>
+  </div>
+
+  <div class="scroller">
+    <div class="map" id="map"></div>
+  </div>
+
+  <div class="foot">
+    <section>
+      <h2>Rode draad</h2>
+      <p>We weten vooraf wat we komen doen, en de kosten zijn besproken voordat de monteur vertrekt. Het bezoek zelf is een formaliteit. Geen verrassingen over prijs, dekking of duur, voor de klant én voor de monteur.</p>
+    </section>
+    <section>
+      <h2>Ontwerpprincipes</h2>
+      <p><b>1. Vraag pas iets als de klant het kan weten.</b> Merk, type en pakketkeuze komen later, als er informatie is.</p>
+      <p><b>2. Alles blijft wijzigbaar tot de acceptatie.</b> Niets is definitief voordat de monteur is geweest.</p>
+      <p><b>3. Geen verrassingen.</b> Werk en kosten zijn vooraf bekend en geaccepteerd.</p>
+      <p><b>4. Eén stap, één actie.</b> Elk bericht zegt waar je bent en wat je nu moet doen.</p>
+      <p><b>5. Digitaal als standaard, bellen altijd mogelijk.</b></p>
+    </section>
+    <section>
+      <h2>Wat er verandert</h2>
+      <p><b>Nu:</b> de beoordeling gebeurt bij de klant thuis. Vaak blijkt pas daar dat het toestel niet kan worden opgenomen, en staat de monteur na 5 minuten weer buiten.</p>
+      <p><b>Straks:</b> de beoordeling gebeurt vooraf, via foto's of vragen. Het meerwerk is digitaal geaccepteerd en ingepland. De monteur komt alleen als het bezoek zin heeft, met het juiste materiaal en genoeg tijd.</p>
+    </section>
+    <section>
+      <h2>Eén statuspagina</h2>
+      <p>Elk bericht linkt naar dezelfde persoonlijke pagina, zonder app of login: waar sta je, wat heb je gedaan, wat moet je nu doen, en alle documenten. Na de acceptatie wordt het het logboek van je toestel.</p>
+    </section>
+    <section>
+      <h2>Kritieke dip</h2>
+      <p>De analyse van toestel en installatie is het laagste punt. De klant moet iets aanleveren en is bang voor een afkeuring. Een keuze tussen foto's en vragen, een goede uitleg van het waarom en een neutrale toon maken hier het verschil.</p>
+    </section>
+    <section>
+      <h2>Nog uitzoeken</h2>
+      <p><b>Oriëntatie:</b> onderzoeken wat klanten echt nodig hebben om te beslissen (zoekwoorden, chatvragen, 5–6 interviews), en dat meenemen in de funnel.</p>
+      <p><b>Betaalgegevens:</b> kan het IBAN pas gevraagd worden als het contract klaar is, na de beoordeling?</p>
+      <p><b>Contract aanmaken:</b> dit is nu lastig en kost veel handwerk. Te onderzoeken: waar het vastloopt, en of het systeem een tijdelijk contract (na de beoordeling) en een officieel contract (na de acceptatie) aankan.</p>
+    </section>
+    <section>
+      <h2>Na deze reis</h2>
+      <p>Nog verder uit te werken: de terugkerende onderhoudscyclus, de reis bij een storing, en het moment van vervanging of upgrade van het toestel.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+const phases = [
+  {
+    t:"Oriëntatie", emo:2.6, emoLabel:"onzeker",
+    goal:"Begrijpen of onderhoud nodig is en wat het mij oplevert.",
+    acts:["Zoekt online: 'onderhoud warmtepomp nodig?'","Leest garantievoorwaarden van de fabrikant","Vraagt de installateur of buren om advies","Vergelijkt een paar aanbieders"],
+    msg:["Geen procesberichten. De klant zoekt zelf"],
+    tp:["Zoekmachine","Website","Reviews","Installateur"],
+    think:"Is onderhoud echt nodig, of is dit een verkooppraatje?", feel:"Twijfelend, wil niet te veel betalen",
+    front:["Per toestel een uitleg in gewone taal: wat gebeurt er bij onderhoud en waarom","Heldere 'wat levert het op': veiligheid, garantie, lager verbruik, langere levensduur","Prijs-indicatie direct zichtbaar, zonder eerst gegevens achter te laten"],
+    back:["Contentbibliotheek per toesteltype","Reviews en keurmerken gekoppeld aan de site"],
+    avoid:["Jargon en angst als verkoopargument","Prijs pas na offerteaanvraag"],
+    mot:"Binnen een minuut snapt de klant waarom onderhoud voor zíjn toestel zinvol is.",
+    kpi:["Doorklik naar contractkeuze","Tijd op uitlegpagina","Zoekverkeer per toestel"],
+    dev:{cv:"Veiligheid (CO) en rendement staan voorop. Vaak bekend terrein voor de klant.",wp:"Garantie van de fabrikant hangt vaak af van aantoonbaar onderhoud. Dat is de sterkste reden.",ac:"Schone filters en koudemiddel op peil bepalen koelvermogen en verbruik. Klant ziet onderhoud vaak als overbodig."}
+  },
+  {
+    t:"Contract kiezen", emo:3.2, emoLabel:"houvast",
+    goal:"Eén contract dat past bij al mijn toestellen, zonder verrassingen achteraf.",
+    acts:["Kiest welke toestellen, en hoeveel van elk","Beantwoordt per toestel twee of drie vragen","Geeft aan wat hij afgedekt wil hebben","Leest de contracten nog één keer terug, in de funnel","Controleert het totaal en sluit af"],
+    msg:["Direct in beeld na afsluiten: 'Stap 1 klaar. Nu: je installatie in 2 minuten' (dezelfde tekst als back-up per mail)"],
+    tp:["Statuspagina (link)","Keuzetool (funnel)","Contractvergelijking in de funnel","Chat","Bevestigingsmail"],
+    think:"Kan ik alles in één keer regelen? En wat zit er nou precies in?", feel:"Voorzichtig positief, wil zekerheid vóór hij tekent",
+    front:["Eerste scherm: 'Welke toestellen wil je laten onderhouden?' met tellers per toestel. Direct duidelijk: alles in één contract","Minimaal nodig in de funnel: postcode + huisnummer (werkgebied, adres automatisch), toestellen en aantal, leeftijd in grove stappen, contactgegevens en akkoord. Merk, type, plek en bereikbaarheid komen later uit de foto's of vragen","Per toestel alleen de vragen die de prijs bepalen","De klant kiest een pakket met een aanbevolen keuze. Dat pakket blijft wijzigbaar tot de acceptatiebeurt","Advies per toestel, met één totaal per maand","Contracten nog eens naast elkaar in een uitklapvenster, zonder de funnel te verlaten. Alleen voor de gekozen toestellen","Een overzicht dat altijd zichtbaar is: toestellen, pakket, totaal","Verwachting zetten: 'Soms is eerst een kleine aanpassing nodig. Dat hoor je altijd vooraf, met een vaste prijs, en je beslist zelf.'"],
+    back:["Productregels per toesteltype en leeftijd","Eén klantrecord met meerdere toestellen onder één contract","Aanmelding vastgelegd: toestellen, pakket, prijs en akkoord van de klant. Nog geen contract in het systeem"],
+    avoid:["Pas na het afsluiten horen dat oude toestellen eerst worden beoordeeld","Voor elk toestel een aparte funnel doorlopen","Een link naar de infopagina die de funnel afbreekt","Andere woorden dan op de infopagina's"],
+    mot:"Vlak voor het afsluiten ziet de klant alle toestellen, wat er per toestel gedekt is en één totaalbedrag.",
+    kpi:["Conversie start → afsluiten","Gemiddeld aantal toestellen per contract","Hoe vaak de vergelijking wordt geopend","Afhakers per stap"],
+    dev:{cv:"Vaak het eerste toestel in het contract. Met een hybride warmtepomp erbij ligt een combinatie voor de hand.",wp:"Het pakket dekt binnen- én buitendeel. In de vergelijking vermelden dat het onderhoud nodig is voor de fabrieksgarantie.",ac:"Teller voor het aantal binnendelen, omdat dat de prijs bepaalt. Meerdere airco's tellen niet als meerdere contracten."}
+  },
+  {
+    t:"Analyse toestel en installatie", emo:2.6, emoLabel:"kleine dip",
+    goal:"Dat Energiewacht weet hoe mijn installatie erbij staat, zonder dat ik technisch hoef te zijn.",
+    acts:["Gaat direct na het afsluiten door, in dezelfde flow","Kiest de route: foto's, vragen of later","Ziet meteen een uitkomst: in orde, we kijken mee, of meerwerk","In orde: plant direct de acceptatiebeurt","Meerwerk: bekijkt de offerte online en geeft akkoord, of kiest 'bel mij'"],
+    msg:["Alleen als nodig: herinnering na 2 dagen als er nog geen foto's of antwoorden zijn","Uitkomst: 'In orde, plan je bezoek' / 'Bekijk je offerte' / 'We bellen je'","Alleen als nodig: herinnering voor de offerte na 2 dagen"],
+    tp:["Statuspagina (link)","Funnel (vervolg na afsluiten)","Portaal / app","E-mail / WhatsApp","Telefoon (op verzoek)"],
+    think:"Waarom willen ze dit weten? Krijg ik straks te horen dat het niet goed is?", feel:"Licht ongemakkelijk. Rustig als de uitleg klopt en de toon neutraal is",
+    front:["Uitleg waarom: 'Zo weet de monteur of hij goed bij je toestel kan en of alles veilig is. Hij komt met het juiste materiaal en genoeg tijd.'","Twee gelijkwaardige routes, allebei optioneel: foto's (ongeveer 2 minuten) of vragen (ongeveer 2 minuten)","Vragen in gewone taal met een voorbeeldplaatje; 'weet ik niet' is altijd goed","Per vraag ook een knop 'Maak een foto', zodat de routes te mengen zijn","Bevestigingsscherm na het afsluiten gaat meteen door: 'Nog één stap: je installatie in 2 minuten'","Direct resultaat als alles duidelijk is: 'Alles lijkt in orde', met de agenda meteen erbij","Twijfel: 'We kijken even mee.' De klant reserveert alvast een tijdvak, uitkomst dezelfde werkdag","Meerwerk: digitale offerte op basis van de eigen foto van de klant, met markering: wat we zien, waarom het nodig is, wat we doen","Onderscheid tussen 'nodig voor je contract' en 'aanbevolen' (optioneel)","Vaste prijs, alles inbegrepen, uitgevoerd in hetzelfde bezoek als de acceptatiebeurt (geen extra voorrijkosten)","Knoppen Akkoord en inplannen / Vraag aan de expert / Bel mij / Niet akkoord (dan vervalt het contract kosteloos)","Na akkoord meteen de agenda om in te plannen","Niet in onderhoud: bericht met uitleg, een alternatief en altijd een aanbod om te bellen","Geen maandbedrag zolang het contract nog niet is geaccepteerd","Bij acute signalen zoals gaslucht direct wat je moet doen, los van het contract"],
+    back:["Foto's en antwoorden komen samen in één installatieprofiel","Na de beoordeling: pakketadvies op basis van het echte toestel ('Voor jouw toestel raden we X aan'), ook als dat een lichter pakket is. Wisselen met één klik","Direct na de beoordeling: automatisch een tijdelijk contract uit de gegevens van de funnel en de analyse (inclusief eventueel meerwerk)","Beslisregels op de antwoorden (leeftijd, plek, bereikbaarheid, veiligheid) geven direct 'in orde' als alles groen is","Fotoherkenning ondersteunt: merk, type, typeplaatje, en markeert mogelijke aandachtspunten voor de binnendienst","Automatisch alleen doorlaten, nooit automatisch afwijzen. Twijfel, meerwerk en 'niet in onderhoud' beoordeelt altijd een mens","Prijslijst met vaste prijzen voor veelvoorkomend meerwerk, zodat een offerte digitaal kan","Akkoord op meerwerk digitaal vastgelegd in CRM en gekoppeld aan het acceptatiebezoek","Geen foto's of antwoorden: de beoordeling schuift door naar de acceptatiebeurt","Profiel bepaalt duur, materiaal (trap, ladder) en type monteur"],
+    avoid:["Na het uploaden niets meer horen","Meerwerkkosten die alleen mondeling zijn afgesproken","Een gemist telefoontje zonder tweede kans (terugbelmoment kiezen)","Verplichte foto's","Beschuldigende toon: 'uw installatie voldoet niet'","Een oordeel op basis van een foto dat als vaststaand wordt gebracht","Vakjargon zoals 'rookgasafvoer' zonder plaatje"],
+    mot:"Is er meerwerk nodig, dan kent de klant de kosten en geeft hij akkoord vóórdat de monteur komt.",
+    kpi:["% dat direct na het afsluiten doorgaat","% met direct resultaat (zonder mens)","Doorlooptijd van upload tot uitkomst","% meerwerk digitaal geaccepteerd vs. via telefoon","% direct geaccepteerd dat bij het bezoek toch meerwerk bleek","Verdeling routes: foto / vragen / later","% profielen compleet vóór de afspraak","% aandachtspunten dat bij het bezoek klopt","Afhakers in deze stap"],
+    dev:{cv:"Vraag met plaatjes: hangt vrij / in een kast met deur / helemaal ingebouwd (alleen met gereedschap los te halen). Plek (keuken, zolder, kast), vrije ruimte aan de voorkant, ventilatie in de ruimte, zit de afvoerpijp vast, roet of verkleuring, CO-melder aanwezig.",wp:"Binnendeel én buitendeel. Buitendeel: waar staat het, bereikbaar zonder ladder, ruimte eromheen vrij, condensafvoer.",ac:"Hoogte van de binnendelen en of er een trap onder kan. Buitendeel op het dak, balkon of hoog aan de gevel betekent extra materiaal."}
+  },
+  {
+    t:"Afspraak maken", emo:3.6, emoLabel:"geregeld",
+    goal:"Een moment dat mij uitkomt, en zeker weten dat het doorgaat.",
+    acts:["In orde: plant direct in de flow na de analyse","Meerwerk: plant direct na het digitale akkoord (of tijdens het belgesprek)","Leest wat hij moet voorbereiden","Krijgt een herinnering","Verzet eventueel zelf"],
+    msg:["Bevestiging met agenda-uitnodiging","2 dagen vooraf: voorbereiding plus klaar-check in één bericht","Alleen als nodig: de dag ervoor, als de klaar-check nog open staat","Ochtend: verwachte tijd","Onderweg: 'Je bent de volgende' met live tijd"],
+    tp:["Statuspagina (link)","Online planner","SMS / WhatsApp","'Monteur onderweg'-bericht"],
+    think:"Moet ik hier een hele dag voor vrij nemen?", feel:"Opgelucht als het tijdvak klein is",
+    front:["Agenda direct in hetzelfde scherm als de uitkomst of het akkoord. Nu gaat dit telefonisch, straks digitaal","Laat zien wat het bezoek inhoudt: acceptatie, veiligheidscheck, eerste onderhoud (+ meerwerk) en de duur","Eerstvolgende vrije moment bovenaan, daarna kiezen per dag","Tijdvakken van twee uur, ook vroeg of op zaterdag","Zelf verzetten of annuleren via een link in elk bericht, zonder in te loggen, tot 24 uur van tevoren","Bevestiging met agenda-uitnodiging (.ics), plus een veld voor bijzonderheden (parkeren, wie er thuis is)","Voorbereiding 2–3 dagen vooraf: een checklist voor alleen de eigen toestellen, met huisdierregels, om digitaal af te vinken","Persoonlijke punten uit de foto's: 'Op je foto zagen we dozen voor de ketel. Wil je die wegzetten?'","Dag ervoor: klaar-check met drie knoppen: 'Alles staat klaar' / 'Ik heb hulp nodig' / 'Verzetten'. Geen reactie? Dan belt de planning","Ingebouwde ketel: voorbeeldfoto's 'zo moet het eruitzien', de klant bevestigt met een foto dat het paneel weg is","Hond: in een aparte ruimte met de deur dicht tijdens het hele bezoek. Bij een warmtepomp niet in de tuin waar het buitendeel staat","Uitleg 'Wat komt de monteur doen?': het bezoek in 5 stappen, per toestel, en waarom elke veiligheidscheck nodig is (één zin, met uitklap voor meer)","Dag ervoor naam en foto van de monteur, op de dag zelf een live aankomsttijd","Het tijdvak wordt steeds smaller: bij het boeken 2 uur, 's ochtends een verwachte tijd, en 'Je bent de volgende' met een live aankomsttijd en kaart zodra de monteur vertrekt","Vertraging? Direct bericht met de nieuwe tijd en de keuze: wachten of kosteloos verzetten","Optie: 'Bel me 30 minuten voordat je er bent'"],
+    back:["Live koppeling met het planningssysteem: alleen tijdvakken die echt beschikbaar zijn","Analyse uit fase 3 bepaalt de lengte van het tijdslot en welke monteur (certificeringen, soort toestel)","Bij meerwerk een langer tijdslot, en het eerste tijdvak pas na de levertijd van het materiaal","Tijdvakken op route: bij voorkeur waar al een monteur in de buurt is","Planners en telefoon werken in dezelfde agenda","De monteur-app zet de status (klaar bij vorige klant, onderweg) en die start automatisch de berichten aan de volgende klant","Voorspelbare duur omdat vooraf bekend is wat er gebeurt, dus een betrouwbaarder tijdvak","Live locatie alleen zichtbaar tijdens de rit naar die ene klant (privacy van de monteur)"],
+    avoid:["Monteur voor een dichtgetimmerde ketel of een losse hond, en na 5 minuten weer buiten","Een 'voorkeur doorgeven'-formulier dat daarna alsnog telefonisch wordt afgestemd","Tijdvakken tonen die de planning niet waar kan maken","Tijdvak van 8 tot 17 uur","Monteur zonder het juiste onderdeel"],
+    mot:"De monteur staat binnen het afgesproken tijdvak voor de deur.",
+    kpi:["% zelf online ingepland","Tijd van akkoord tot afspraak","Telefoontjes naar de planning","Telefoontjes 'waar blijft de monteur?'","Gemiddelde afwijking tussen verwachte en echte aankomsttijd","% op tijd binnen tijdvak","Verzetpercentage","Niet-thuis-percentage"],
+    dev:{cv:"Standaard tijdslot. Vaak te combineren met een ander bezoek in de wijk.",wp:"Buitendeel moet bereikbaar zijn. Benoem dat in de checklist.",ac:"Binnendelen hoog aan de muur: vraag of er ruimte is voor een trap."}
+  },
+  {
+    t:"Acceptatiebeurt + eerste onderhoud", emo:4.5, emoLabel:"vertrouwen",
+    goal:"Weten dat mijn toestel veilig en goed werkt, en waar ik aan toe ben.",
+    acts:["Ontvangt de monteur","Kijkt mee en krijgt uitleg","Ontvangt het rapport","Geeft feedback"],
+    msg:["Na vertrek: 'Je rapport staat klaar en je contract is actief' (één bericht)"],
+    tp:["Statuspagina (link)","Monteur aan huis","Digitaal rapport","Sticker op toestel","Portaal"],
+    think:"Wat heeft hij gedaan, en is alles in orde?", feel:"Gerustgesteld, voelt zich serieus genomen",
+    front:["Een formaliteit: de monteur weet vooraf alles uit het dossier (foto's, antwoorden, akkoord op meerwerk, klachten)","Vaste regel: geen werk en geen kosten zonder akkoord vooraf. Iets nieuws gevonden? Stoppen, laten zien, vaste prijs, de klant beslist op de tablet","Acceptatie en eerste onderhoud in één bezoek","Nulmeting als startpunt voor de volgende jaren","Adviesgesprek van 10 minuten: wat is er gedaan, waarom jaarlijks onderhoud, doorvragen naar gebruik en plannen","Vooruitkijken naar kosten: wat valt binnen en buiten het contract, en wat kan de komende jaren nodig zijn (met onderbouwing)","Rapport zodra de monteur vertrekt, als mobiele pagina (PDF als download): de conclusie eerst in één zin, dan wat er gedaan is, met dezelfde stappen als de uitleg vooraf","Meetwaarden vertaald: is het goed, wat betekent het, moet ik iets doen. Technische waarden in een uitklapbare bijlage","Aandachtspunten met prioriteit (nu / binnenkort / in de gaten houden), een kostenindicatie en een actieknop","Volgende beurt staat direct gepland"],
+    back:["Tablet met het klantdossier, de vaste prijslijst, digitaal akkoord en een praatplaat per toestel","Monteur voert bevindingen in met standaardzinnen per bevinding, geen vrije vaktekst","Vertaalregels per meetwaarde en per toestelmodel: grenswaarden, dan klanttaal. Niet gemeten = 'niet gemeten', nooit groen","Verwachtingenkaart in het rapport: per toestel wat gedekt is, wat niet, en een indicatie van toekomstige kosten","Signalen uit het gesprek (verbouwing, verduurzaming, vervanging) vastgelegd in CRM voor opvolging","Afsluiting: na de acceptatiebeurt wordt het officiële contract aangemaakt uit het tijdelijke contract plus de gegevens van de monteur. Dekking gaat in","Meetwaarden opgeslagen als basis voor volgende beurten","Feedback gekoppeld aan monteur en vestiging"],
+    avoid:["Werk of kosten zonder akkoord vooraf","Een monteur die als verkoper overkomt","'Dit moet binnenkort vervangen worden' zonder meting of onderbouwing","Afkeur zonder advies of alternatief","Een rapport vol ppm, °C en foutcodes zonder uitleg","Alleen kleuren zonder woorden"],
+    mot:"De klant zegt na afloop: 'Het ging precies zoals beloofd, en ik weet wat ik de komende jaren kan verwachten.'",
+    kpi:["Klantinspanning (CES) na bezoek","First-time-fix","% geaccepteerd","NPS"],
+    dev:{cv:"Rookgasanalyse en CO-meting, brander en warmtewisselaar reinigen, waterdruk controleren.",wp:"Filters en waterdruk, instellingen van de stooklijn nalopen, buitendeel vrijmaken. Uitleg over zuinig stoken.",ac:"Filters en binnendelen reinigen, condensafvoer checken, koudemiddeldruk controleren."}
+  },
+  {
+    t:"Welkom: onderhoud en 24/7 storingshulp", emo:4.3, emoLabel:"ontzorgd",
+    goal:"Er niet meer over hoeven nadenken, en snel geholpen worden als het misgaat.",
+    acts:["Ontvangt het bericht dat het contract actief is","Slaat het storingsnummer op, of scant de QR-code op het toestel","Ziet de volgende onderhoudsbeurt in zijn agenda","Meldt een storing via app, WhatsApp of telefoon, dag en nacht"],
+    msg:["Pas weer bij de volgende onderhoudsbeurt, of als de klant zelf een storing meldt"],
+    tp:["Statuspagina (link)","Welkomstbericht","Sticker met QR op toestel","Portaal / app","24/7 storingslijn"],
+    think:"Wat doe ik als hij het midden in de nacht niet doet?", feel:"Gerust, voelt zich ontzorgd",
+    front:["Welkomstbericht direct na de acceptatie: 'Je contract is actief', met een overzicht van wat je hebt","Onderhoudsinterval per toestel duidelijk benoemd (elk jaar of om het jaar)","Sticker op het toestel met storingsnummer en QR-code. Melden gaat direct met de toestelgegevens erbij","Eerst een zelfcheck in 3 stappen (waterdruk, thermostaat, stroom). Een deel van de storingen is dan al opgelost","Een duidelijke belofte: wanneer is er iemand bereikbaar, en wanneer staat er iemand voor de deur","Live status van de melding: 'Monteur onderweg, aankomst 14:20'","Onderhoudsherinnering automatisch, met een link om zelf in te plannen"],
+    back:["Contract actief, dus de onderhoudscyclus staat automatisch in de planning","Toestelgegevens, foto's en meetwaarden bekend: de storingsmonteur weet vooraf wat er staat","Prioriteit bij storing: geen warmte in de winter, kwetsbare bewoners, hitte","24/7 bezetting, met extra capaciteit in de winterpiek"],
+    avoid:["Het storingsnummer moeten zoeken als het koud is","Opnieuw alle gegevens moeten doorgeven","'24/7' dat alleen bereikbaarheid blijkt te zijn","Onderhoud dat vergeten wordt"],
+    mot:"Bij de eerste storing weet de klant na één melding wanneer er iemand komt.",
+    kpi:["Tijd tot hulp bij storing","% opgelost via zelfcheck","% onderhoud op tijd uitgevoerd","Verlenging vs. opzegging","NPS na een storing"],
+    dev:{cv:"Geen verwarming of warm water is de meest urgente storing. Zelfcheck: de waterdruk.",wp:"Een storing staat vaak als foutcode op het display. Een foto van het display meesturen versnelt de hulp.",ac:"Storingen pieken tijdens hitte. Prioriteit voor kwetsbare bewoners."}
+  }
+];
+
+const devNames = {cv:"Cv-ketel",wp:"Warmtepomp",ac:"Airco / koeling"};
+const lanes = [
+  ["Klantdoel","Wat wil de klant bereiken", p=>`<p class="goal" style="margin:0">${p.goal}</p>`],
+  ["Wat de klant doet","", p=>`<ul>${p.acts.map(a=>`<li>${a}</li>`).join("")}</ul>`],
+  ["Touchpoints","", p=>`<div class="tp">${p.tp.map(a=>`<span>${a}</span>`).join("")}</div>`],
+  ["Berichten aan de klant","Eén stap, één actie", p=>`<ul>${p.msg.map(a=>`<li>${a}</li>`).join("")}</ul>`],
+  ["Denkt & voelt","", p=>`<p class="quote">${p.think}</p><div class="feel">${p.feel}</div>`],
+  ["EMO"],
+  ["Energiewacht doet","Frontstage: wat de klant ziet", p=>`<ul>${p.front.map(a=>`<li>${a}</li>`).join("")}</ul>`],
+  ["Achter de schermen","Backstage: systemen en processen", p=>`<ul>${p.back.map(a=>`<li>${a}</li>`).join("")}</ul>`],
+  ["Voorkomen","Wat de ervaring breekt", p=>`<ul class="avoid">${p.avoid.map(a=>`<li>${a}</li>`).join("")}</ul>`],
+  ["Moment of truth","", p=>`<p>${p.mot}</p>`, "mot"],
+  ["Per toestel","Wat anders is", p=>`<div class="dev">${Object.entries(p.dev).map(([k,v])=>`<div data-d="${k}"><b>${devNames[k]}</b>${v}</div>`).join("")}</div>`],
+  ["Meten","KPI's", p=>`<div class="kpi">${p.kpi.map(a=>`<span>${a}</span>`).join("")}</div>`],
+];
+
+const map = document.getElementById("map");
+let html = `<div class="lane">Fase</div>` + phases.map((p,i)=>`<div class="phase-h cell" data-i="${i}" tabindex="0" role="button" aria-pressed="false"><span class="n">Fase ${i+1}</span><h3>${p.t}</h3></div>`).join("");
+lanes.forEach(([name,sub,fn,cls],li)=>{
+  if(name==="EMO"){
+    html += `<div class="lane">Emotiecurve<small>1 = frustratie · 5 = blij</small></div><div class="emo" id="emo"></div>`;
+    return;
+  }
+  html += `<div class="lane">${name}${sub?`<small>${sub}</small>`:""}</div>`;
+  html += phases.map((p,i)=>`<div class="cell ${cls||""}" data-i="${i}">${cls==="mot"?"<b>Moment of truth</b>":""}${fn(p)}</div>`).join("");
+});
+map.innerHTML = html;
+// last row: no bottom border
+[...map.children].slice(-(phases.length+1)).forEach(el=>el.style.borderBottom="0");
+
+// emotion curve
+const emo = document.getElementById("emo");
+const xs = phases.map((_,i)=>(i+.5)/phases.length*1000);
+const ys = phases.map(p=>100-(p.emo-1)/4*100);
+let d = `M${xs[0]},${ys[0]}`;
+for(let i=1;i<xs.length;i++){const cx=(xs[i-1]+xs[i])/2;d+=` C${cx},${ys[i-1]} ${cx},${ys[i]} ${xs[i]},${ys[i]}`;}
+emo.innerHTML = `<svg viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="var(--cool)"/><stop offset="1" stop-color="var(--warm)"/></linearGradient>
+    <linearGradient id="ga" x1="0" x2="1"><stop offset="0" stop-color="var(--cool)"/><stop offset="1" stop-color="var(--warm)"/></linearGradient>
+  </defs>
+  <g class="grid">${[0,25,50,75,100].map(y=>`<line x1="0" x2="1000" y1="${y}" y2="${y}"/>`).join("")}</g>
+  <path class="area" d="${d} L${xs[xs.length-1]},100 L${xs[0]},100 Z"/>
+  <path class="curve" d="${d}"/>
+</svg>` + phases.map((p,i)=>`<div class="dot cell" data-i="${i}" style="left:${(i+.5)/phases.length*100}%;top:calc(14px + (100% - 40px) * ${ys[i]/100})"><i></i><em>${p.emo.toFixed(1).replace(".",",")} · ${p.emoLabel}</em></div>`).join("")
+  + `<span class="scale" style="position:absolute;left:6px;top:4px">5</span><span class="scale" style="position:absolute;left:6px;bottom:10px">1</span>`;
+
+// phase focus
+let focus = null;
+function setFocus(i){
+  focus = (focus===i)?null:i;
+  map.classList.toggle("focus", focus!==null);
+  map.querySelectorAll(".cell").forEach(el=>{
+    const on = focus!==null && +el.dataset.i===focus;
+    el.classList.toggle("on",on);
+    el.classList.toggle("dim", focus!==null && !on);
+  });
+  map.querySelectorAll(".phase-h").forEach(h=>h.setAttribute("aria-pressed", String(+h.dataset.i===focus)));
+  document.getElementById("hint").textContent = focus===null ? "Klik op een fasekop om te focussen" : `Focus op fase ${focus+1}. Klik nogmaals om alles te tonen.`;
+}
+map.querySelectorAll(".phase-h").forEach(h=>{
+  h.addEventListener("click",()=>setFocus(+h.dataset.i));
+  h.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setFocus(+h.dataset.i);}});
+});
+
+// device filter
+function setDev(dev){
+  document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed", String(c.dataset.dev===dev)));
+  document.querySelectorAll(".dev div").forEach(el=>{ el.hidden = !(dev==="all" || el.dataset.d===dev); });
+  try{localStorage.setItem("ew-dev",dev)}catch(e){}
+}
+document.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>setDev(c.dataset.dev)));
+try{const s=localStorage.getItem("ew-dev"); if(s) setDev(s);}catch(e){}
+</script>
+
+</body>
+</html>
